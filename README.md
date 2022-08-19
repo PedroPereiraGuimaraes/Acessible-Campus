@@ -1,2 +1,2 @@
 # Acessible Campus
-afaef
+O aplicativo Accessible Campus tem como finalidade auxiliar pessoas com deficiência visual a se locomover no campus do Inatel. Para isso foram usados os parâmetros de localização utilizando RSSI (Received Signal Strength Indication) para localização indoor e o módulo ESP8266. O RSSI  é o parâmetro mais simples e popular utilizado em técnicas de localização indoor. Isso se da pelo fato de que esse dado pode ser obtido sem nenhuma adição ou maior processamento de hardware.
