@@ -27,20 +27,19 @@ void loop() {
   bool hidden;
   int scanResult;
 
-  Serial.println(F("Starting WiFi scan..."));
 
   scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
 
   if (scanResult == 0) {
     Serial.println(F("No networks found"));
   } else if (scanResult > 0) {
-    Serial.printf(PSTR("%d networks found:\n"), scanResult);
+    Serial.printf(PSTR("%d networks:\n"), scanResult);
 
     // Print unsorted scan results
     for (int8_t i = 0; i < scanResult; i++) {
       WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
 
-      if (ssid == "esp01" || ssid == "esp02") {
+      if (ssid == "esp01" || ssid == "esp02" || ssid == "esp03" || ssid == "esp04") {
         Serial.printf(PSTR("%ddBm %s\n"),
                       rssi,
                       ssid.c_str());
