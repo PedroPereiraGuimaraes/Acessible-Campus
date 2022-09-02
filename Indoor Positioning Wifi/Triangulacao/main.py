@@ -1,60 +1,79 @@
+import tkinter as tk
+from tkinter import font as tkfont
+import matplotlib.pyplot as plt
+from grafico import *
 
-##Para o correto funcionamento da função é necessario que sejam
-##colocados em ordem de Beacon1[x,y,rssi], Beacon2[x,y,rssi], Beacon3[x,y,rssi]
-import math
 
-def triangulacao(x1, y1, rssi1, x2, y2, rssi2, x3, y3, rssi3):
+## Funcao principal
+class Main(tk.Tk):
 
-    raio1 = rssiParaDistancia(rssi1)
-    raio2 = rssiParaDistancia(rssi2)
-    raio3 = rssiParaDistancia(rssi3)
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
 
-    print("Distancia R1: ")
-    print(round(raio1,2))
-    print("Distancia R2: ")
-    print(round(raio2,2))
-    print("Distancia R3: ")
-    print(round(raio3,2))
+        self.title_font = tkfont.Font(family='Righteous', size=18)
+        self.base_font = tkfont.Font(family='Righteous', size=12)
+        self.title("Acessible Campus")
 
-    ##Fazendo os calculos da triangulação por simplificação
-    a = 2 * (-x1 + x2)
-    b = 2 * (-y1 + y2)
-    c = (raio1 ** 2) - (raio2 ** 2) - (x1 ** 2) + (x2 ** 2) - (y1 ** 2) + (y2 ** 2)
-    d = 2 * (-x2 + x3)
-    e = 2 * (-y2 + y3)
-    f = (raio2 ** 2) - (raio3 ** 2) - (x2 ** 2) + (x3 ** 2) - (y2 ** 2) + (y3 ** 2)
+        ## Definido as dimensões da tela
+        width = 800
+        frm_width = self.winfo_rootx() - self.winfo_x()
+        win_width = width + 2 * frm_width
 
-    x = 10000
-    y = 10000
+        height = 550
+        titlebar_height = self.winfo_rooty() - self.winfo_y()
+        win_height = height + titlebar_height + frm_width
 
-    ##Calculando as coordenadas de x e y do dispositivo
-    if ((e * a) - (b * d)) == 0 & ((b * d) - (a * e)) == 0:
-        x = 0
-        y = 0
-    elif((e*a) - (b*d)) == 0:
-        y = ((c * d) - (a * f)) / ((b * d) - (a * e))
-        x=0
-    elif((b * d) - (a * e)) == 0:
-        x = ((c * e) - (f * b)) / ((e * a) - (b * d))
-        y = 0
-    else:
-        x = ((c * e) - (f * b)) / ((e * a) - (b * d))
-        y = ((c * d) - (a * f)) / ((b * d) - (a * e))
+        ## Calculos para colocar a janela no meio da tela
+        x = self.winfo_screenwidth() // 2 - win_width // 2
+        y = self.winfo_screenheight() // 2 - win_height // 2
 
-    return x,y
+        self.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
-def rssiParaDistancia(rssi):
+        ## Container vai conter todas as telas
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
 
-    ## Rssi por um metro
-    a = -50
-    ## Rssi - Rssi/metro dividido pelo PathLoss
-    w = (rssi - a) / -20
-    ## Calculo do Log(distancia)
-    distancia = 10 ** w
+        self.frames = {}
+        for F in (Home, Login):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.frames[page_name] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
 
-    return distancia
+        self.show_frame("Home")
 
-def distanciaParaRssi(distancia):
+    def show_frame(self, page_name):
+        '''Show a frame for the given page name'''
+        frame = self.frames[page_name]
+        frame.tkraise()
 
-    rssi = -50 - 20*math.log(distancia,10)
-    return rssi
+
+## Pagina inicial
+class Home(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        tk.Button(self, text='Plotar', width=10, height=2, bd=2, bg="#FFFFFF",
+                  command=lambda: grafico(self,[x.get(), y.get()])).place(x=550, y=300)
+        tk.Label(self, text="Valor de x: ").place(x=548, y=170)
+        x = tk.Entry(self, width=30, bd=2, bg="#FFFFFF")
+        x.place(x=550, y=190)
+        tk.Label(self, text="Valor de y:").place(x=548, y=220)
+        y = tk.Entry(self, width=30, bd=2, bg="#FFFFFF")
+        y.place(x=550, y=240)
+
+
+class Login(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+
+if __name__ == "__main__":
+    app = Main()
+    app.mainloop()

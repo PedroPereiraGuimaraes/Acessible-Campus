@@ -3,7 +3,7 @@
     The API is almost the same as with the WiFi Shield library,
     the most obvious difference being the different file you need to include:
 */
-
+#include <math.h>
 #include <ESP8266WiFi.h>
 
 void setup() {
@@ -26,6 +26,9 @@ void loop() {
   int32_t channel;
   bool hidden;
   int scanResult;
+  double a;
+  double w;
+  double distancia;
 
 
   scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
@@ -39,10 +42,15 @@ void loop() {
     for (int8_t i = 0; i < scanResult; i++) {
       WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
 
-      if (ssid == "esp01" || ssid == "esp02" || ssid == "esp03" || ssid == "esp04") {
+      if (ssid == "Roteador Davi") {
         Serial.printf(PSTR("%ddBm %s\n"),
                       rssi,
                       ssid.c_str());
+        a = -50;
+        w = (rssi - a) / (-20);
+        distancia = pow(10, w);
+        Serial.print(distancia);
+        Serial.println(" Metros");
         delay(0);
       }
 
