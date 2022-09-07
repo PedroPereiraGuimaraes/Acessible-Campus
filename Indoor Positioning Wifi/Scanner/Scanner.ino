@@ -1,65 +1,77 @@
-/*
-    This sketch demonstrates how to scan WiFi networks.
-    The API is almost the same as with the WiFi Shield library,
-    the most obvious difference being the different file you need to include:
-*/
-#include <math.h>
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println(F("\nESP8266 WiFi scan example"));
+const char* ssid = "PedroGuimaraes";
+const char* password = "ronk1234";
 
-  // Set WiFi to station mode
-  WiFi.mode(WIFI_STA);
+ESP8266WebServer server(80);
 
-  // Disconnect from an AP if it was previously connected
-  WiFi.disconnect();
-  delay(100);
+const int led = 2;
+
+void handleRoot() {
+  digitalWrite(led, 1);
+
+  String textoHTML;
+  textoHTML += WiFi.RSSI();
+   
+  server.send(200, "text/html", textoHTML);
+  digitalWrite(led, 0);
 }
 
-void loop() {
-  String ssid;
-  int32_t rssi;
-  uint8_t encryptionType;
-  uint8_t* bssid;
-  int32_t channel;
-  bool hidden;
-  int scanResult;
-  double a;
-  double w;
-  double distancia;
+void handleNotFound(){
+  digitalWrite(led, 1);
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i=0; i<server.args(); i++){
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+  digitalWrite(led, 0);
+}
 
+void setup(void){
+  pinMode(led, OUTPUT);
+  digitalWrite(led, 0);
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("");
 
-  scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
-  if (scanResult == 0) {
-    Serial.println(F("No networks found"));
-  } else if (scanResult > 0) {
-    Serial.printf(PSTR("%d networks:\n"), scanResult);
-
-    // Print unsorted scan results
-    for (int8_t i = 0; i < scanResult; i++) {
-      WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
-
-      if (ssid == "Roteador Davi") {
-        Serial.printf(PSTR("%ddBm %s\n"),
-                      rssi,
-                      ssid.c_str());
-        a = -50;
-        w = (rssi - a) / (-20);
-        distancia = pow(10, w);
-        Serial.print(distancia);
-        Serial.println(" Metros");
-        delay(0);
-      }
-
-
-    }
-  } else {
-    Serial.printf(PSTR("WiFi scan error %d"), scanResult);
+  if (MDNS.begin("esp8266")) {
+    Serial.println("MDNS responder started");
   }
 
-  // Wait a bit before scanning again
-  delay(5000);
+  server.on("/", handleRoot);
+
+  server.on("/inline", [](){
+    server.send(200, "text/plain", "this works as well");
+  });
+
+  server.onNotFound(handleNotFound);
+
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void loop(void){
+  server.handleClient();
 }

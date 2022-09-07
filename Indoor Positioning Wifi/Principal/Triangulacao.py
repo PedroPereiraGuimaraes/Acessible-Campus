@@ -58,3 +58,4 @@ def distanciaParaRssi(distancia):
     rssi = -50 - 20*math.log(distancia,10)
     return rssi
 
+print(distanciaParaRssi(1))

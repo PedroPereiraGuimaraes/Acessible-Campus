@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import font as tkfont
-import matplotlib.pyplot as plt
+
+from Dados import distancia
 from grafico import *
 
 
@@ -57,14 +58,11 @@ class Home(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        def plotar():
+            grafico(self, distancia())
+
         tk.Button(self, text='Plotar', width=10, height=2, bd=2, bg="#FFFFFF",
-                  command=lambda: grafico(self,[x.get(), y.get()])).place(x=550, y=300)
-        tk.Label(self, text="Valor de x: ").place(x=548, y=170)
-        x = tk.Entry(self, width=30, bd=2, bg="#FFFFFF")
-        x.place(x=550, y=190)
-        tk.Label(self, text="Valor de y:").place(x=548, y=220)
-        y = tk.Entry(self, width=30, bd=2, bg="#FFFFFF")
-        y.place(x=550, y=240)
+                  command=lambda: plotar()).place(x=600, y=250)
 
 
 class Login(tk.Frame):
