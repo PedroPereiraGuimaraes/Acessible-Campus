@@ -4,12 +4,9 @@ import time
 
 def distancia():
     time.sleep(1)
-    resposta = requests.get('http://192.168.0.100/')
+    resposta = requests.get('http://192.168.0.103/')
     dados = resposta.text
     dados = int(dados)
-
-    print(f"{dados} dbm")
-    print(f"{round(rssiParaDistancia(dados),4)} metros")
 
     return rssiParaDistancia(dados)
 
@@ -24,3 +21,4 @@ def rssiParaDistancia(rssi):
 
     return distancia
 
+distancia()

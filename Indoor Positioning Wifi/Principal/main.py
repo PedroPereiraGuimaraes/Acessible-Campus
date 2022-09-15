@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font as tkfont
 
 from Dados import distancia
+from Fala import falar
 from grafico import *
 
 
@@ -37,7 +38,7 @@ class Main(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (Home, Login):
+        for F in (Home, Nada):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -58,14 +59,28 @@ class Home(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        global img0, img1, img2
+
+        img0 = tk.PhotoImage(file="imagens/background.png")
+        img1 = tk.PhotoImage(file="imagens/logo.png")
+        img2 = tk.PhotoImage(file="imagens/plotar.png")
+
         def plotar():
-            grafico(self, distancia())
+            saida = distancia()
+            grafico(self, saida)
+            resposta(saida)
 
-        tk.Button(self, text='Plotar', width=10, height=2, bd=2, bg="#FFFFFF",
-                  command=lambda: plotar()).place(x=600, y=250)
+
+        def resposta(metros):
+            falar(f"Você está a aproximadamente {round(metros,2)} metros do roteador")
+
+        tk.Label(self, image=img0).place(x=-2, y=0)
+        tk.Label(self, image=img1, bg="#51C1E1").place(x=580, y=150)
+        tk.Button(self, image=img2, bd=0, bg='#51C1E1', activebackground='#51C1E1',
+                  command=lambda: [plotar()]).place(x=570, y=350)
 
 
-class Login(tk.Frame):
+class Nada(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)

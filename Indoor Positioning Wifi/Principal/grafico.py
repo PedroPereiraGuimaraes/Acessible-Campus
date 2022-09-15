@@ -15,4 +15,4 @@ def grafico(janela, pos):
     canvas.draw()
     canvas.get_tk_widget().pack()
 
-    canvas.get_tk_widget().place(x=0, y=0)
+    canvas.get_tk_widget().place(x=10, y=10)
